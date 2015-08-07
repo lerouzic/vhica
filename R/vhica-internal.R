@@ -204,7 +204,7 @@ function (col.obj, main = "", p.adjust.method = "none", nslices = 1000,
     thresh.lines = NA) 
 {
     par(mar = c(4, 1, 2, 1))
-    if (!require("plotrix")) {
+    if (!requireNamespace("plotrix", quietly=TRUE)) {
         frame()
         return
     }
@@ -273,7 +273,7 @@ function (pmatrix, species, elements, zlim = range(pmatrix, na.rm = TRUE),
 function (tree, species = "", horizontal = FALSE, show.tip.label = FALSE, 
     ...) 
 {
-    if (!require("ape")) 
+    if (!requireNamespace("ape", quitely=TRUE)) 
         stop("Cannot plot trees without the package ape")
     shift <- if (length(tree$tip.label) < 15) 
         22/(length(tree$tip.label)^1.5)
@@ -334,7 +334,7 @@ function (treefile)
         warning("No tree file specfied: the phylogeny will not be plotted")
         return(NA)
     }
-    if (!require(ape)) {
+    if (!requireNamespace("ape", quietly=TRUE)) {
         warning("The ape library is not available: the phylogeny will not be plotted")
         return(NA)
     }
@@ -383,10 +383,12 @@ function (cbias, div, reference = "Gene", divergence = "dS",
 {
     full.list <- .tables2list(cbias, div, warn = warn, reference = reference, 
         divergence = divergence)
-    if (!require(parallel)) {
-        mclapply <- lapply
+    if (requireNamespace("parallel", quietly=TRUE)) {
+		mymclapply <- parallel::mclapply
+	} else {
+        mymclapply <- lapply
     }
-    return(mclapply(full.list, FUN = function(cross) {
+    return(mymclapply(full.list, FUN = function(cross) {
         cross2 <- cross[cross$Type == reference, ]
         cross.TE <- cross[cross$Type != reference, ]
         meanCB <- 0.5 * cross2$CB1 + 0.5 * cross2$CB2
@@ -515,8 +517,10 @@ function (vhica.obj, element, elements, p.adjust.method = "none",
 function (cbias, div, check = TRUE, keep.absent = FALSE, warn = FALSE, 
     reference = "Gene", divergence = "dS") 
 {
-    if (!require(parallel)) {
-        mclapply <- lapply
+    if (requireNamespace("parallel", quietly=TRUE)) {
+		mymclapply <- parallel::mclapply
+	} else {
+        mymclapply <- lapply
     }
     .make.unitary.table <- function(nn, sp1, sp2, sub.div) {
         if (nn %in% cbias[, 1]) {
@@ -554,7 +558,7 @@ function (cbias, div, check = TRUE, keep.absent = FALSE, warn = FALSE,
             sub.div <- div[(div[, 3] == sp1 & div[, 4] == sp2) | 
                 (div[, 3] == sp2 & div[, 4] == sp1), ]
             compnames <- rownames(sub.div) <- sub.div[, 1]
-            tt <- do.call(rbind, mclapply(compnames, .make.unitary.table, 
+            tt <- do.call(rbind, mymclapply(compnames, .make.unitary.table, 
                 sp1 = sp1, sp2 = sp2, sub.div = sub.div))
             rownames(tt) <- tt$name
             tt$name <- NULL
@@ -565,4 +569,17 @@ function (cbias, div, check = TRUE, keep.absent = FALSE, warn = FALSE,
         }
     }
     return(ans)
+}
+.ENC <-
+function(seq, numcode=1) 
+{
+	stopifnot(! "SeqFastaDNA" %in% class(seq)) 
+	if (!requireNamespace("seqinr", quietly=TRUE)) {
+		stop("ENC calculation requires package seqinr")
+	}
+	yy <- seqinr::ucoweight(seq, numcode=numcode)
+    yy.filt <- yy[sapply(yy,sum) > 1 & names(yy) != "*"]
+    Fc <- sapply(yy.filt, function(x) {n <- sum(x); (n*sum((x/n)^2)-1)/(n-1)}) 
+    SF <- sapply(yy.filt, length)
+	2 + sum(SF==2)/mean(Fc[SF==2]) + sum(SF==3)/mean(Fc[SF==3]) + sum(SF==4)/mean(Fc[SF==4]) + sum(SF==6)/mean(Fc[SF==6])    
 }
