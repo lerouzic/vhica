@@ -570,16 +570,56 @@ function (cbias, div, check = TRUE, keep.absent = FALSE, warn = FALSE,
     }
     return(ans)
 }
+.checkseq <-
+function(seq) {
+	# 0 check if the object makes sense
+	stopifnot(
+		length(seq) > 0,
+		is.list(seq),
+		all(sapply(seq, function(s) "SeqFastadna" %in% class(s))))
+	# 1 check if all sequences have the same size
+	ll <- sapply(seq, length)
+	if (max(ll) != min(ll)) {
+		warning("Sequences have not the same length. Adding as many n as necessary.")
+		seq <- lapply(seq, function(s) c(s, rep("n", max(ll)-length(s))))
+	}
+	#2 check if sequence length is a multiple of 3
+	mll <- max(ll)
+	if (mll %% 3 != 0) {
+		warning("Sequence length ", mll, " is not a multiple of 3. Truncating.")
+		seq <- lapply(seq, function(s) s[1:(3*(mll%/%3))])
+	}
+	return(seq)
+}
 .ENC <-
 function(seq, numcode=1) 
 {
-	stopifnot(! "SeqFastaDNA" %in% class(seq)) 
-	if (!requireNamespace("seqinr", quietly=TRUE)) {
-		stop("ENC calculation requires package seqinr")
-	}
+	stopifnot(
+		"SeqFastadna" %in% class(seq),
+		requireNamespace("seqinr"))
 	yy <- seqinr::ucoweight(seq, numcode=numcode)
     yy.filt <- yy[sapply(yy,sum) > 1 & names(yy) != "*"]
     Fc <- sapply(yy.filt, function(x) {n <- sum(x); (n*sum((x/n)^2)-1)/(n-1)}) 
     SF <- sapply(yy.filt, length)
 	2 + sum(SF==2)/mean(Fc[SF==2]) + sum(SF==3)/mean(Fc[SF==3]) + sum(SF==4)/mean(Fc[SF==4]) + sum(SF==6)/mean(Fc[SF==6])    
+}
+.LWL85 <-
+function(seq, sq1=names(seq)[1], sq2=names(seq)[2], pairwise=FALSE)
+{
+	stopifnot(
+		all(sapply(seq, function(s) "SeqFastadna" %in% class(s))),
+		length(sq1) == length(sq2),
+		all(c(sq1,sq2) %in% names(seq)),
+		requireNamespace("seqinr"))
+	if (!pairwise) {
+		ali <- seqinr::as.alignment(nb=length(seq), nam=names(seq), seq=sapply(seq, function(s) paste(s, collapse="")))
+		ks <- as.matrix(seqinr::kaks(ali)$ks)
+		return(ks[sq1, sq2])
+	} else {
+		return(sapply(1:length(sq1), function(i) {
+				subseq <- seq[c(sq1[i], sq2[i])]
+				subali <- seqinr::as.alignment(seq=sapply(subseq, function(s) paste(s, collapse="")))
+				return(seqinr::kaks(subali)$ks[1])
+			}))
+	}
 }

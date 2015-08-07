@@ -11,7 +11,7 @@ function(file=NULL, sequence=NULL, method="ENC")
 		}		
 		sequence <- seqinr::read.fasta(file)
 	}
-	# sequence should be a list of SeqFastadna objects
+	sequence <- .checkseq(sequence)
 	if (method[1]=="ENC") {
 		return(sapply(sequence, .ENC))
 	}

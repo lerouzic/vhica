@@ -26,7 +26,9 @@ Wright, F. (1990). The 'effective number of codons' used in a gene. Gene, 87(1),
 \author{
 Aurelie Hua-Van and Arnaud Le Rouzic.
 }
-
+\seealso{
+	\code{\link{div}}
+}
 \examples{
 	seq.file <- system.file("extdata/Genes", "Amd.fas", package="vhica")
 	CUB(seq.file)
