@@ -7,33 +7,50 @@
 }
 
 \description{
-	The VHICA method relies on two sources of information: (i) the divergence between sequences, and (ii) the codon usage bias. This function reads two data files and creates an object of class \code{vhica} that can be further explored by \code{\link{plot.vhica}} and \code{\link{image.vhica}}.
+	The VHICA method relies on two sources of information: (i) the divergence between sequences, and (ii) the codon usage bias. This function reads two data files and creates an object of class \code{vhica} that can be further explored by \code{\link{plot.vhica}} and \code{\link{image.vhica}}. Input can be either (1) two vectors of fasta file names (one for the genes, one for the putatively transfered genes), or (2) already processed files containing codon usage bias and divergence data (see Details). 
 }
 
 \usage{
-read.vhica(cb.filename, div.filename, reference = "Gene", 
-divergence = "dS", ...)
+read.vhica(gene.fasta=NULL, target.fasta=NULL, 
+	cb.filename=NULL, div.filename=NULL, 
+	reference = "Gene", divergence = "dS", 
+	CUB.method="ENC", div.method="LWL85", div.pairwise=FALSE, 
+	species.sep="_", gene.sep=".", ...)
 }
 
 \arguments{
+  \item{gene.fasta}{
+    Sequence files (FASTA format) containing the aligned sequences 
+    (respecting the translation phase) for all species of the reference genes.}
+  \item{target.fasta}{
+    Sequence files (FASTA format) containing the aligned sequence 
+    of the putatively transfered genes.}
   \item{cb.filename}{
-	File name for the codon usage bias data. 
-}
+	File name for the codon usage bias data. If FASTA files are provided, this file will be created.}
   \item{div.filename}{
-	File name for the divergence data. 
-}
+	File name for the divergence data. If FASTA files are provided, this file will be created.}
   \item{reference}{
-	Name of the reference type in the codon usage file. Default is "Gene". 
-}
+	Name of the reference type in the codon usage file. Default is "Gene".}
   \item{divergence}{
-	Name of the divergence column in the divergence file. Default is "dS". 
-}
+	Name of the divergence column in the divergence file. Default is "dS".}
+  \item{CUB.method}{
+    Method to be used for Codon Usage Bias calculation (see \code{\link{CUB}}).}
+  \item{div.method}{
+    Method to be used for divergence calculation (see \code{\link{div}}).}
+  \item{div.pairwise}{
+	Whether divergence should be calculated from the whole alignment of between pairs of sequences
+	(see \code{\link{div}}).}
+  \item{species.sep}{
+	Separator for species (or equivalent) labels in sequence names. Any character string following 
+	this separator will be disregarded -- be careful about potential duplicates.}
+  \item{gene.sep}{
+    Separator for gene names from gene sequence files.}
   \item{\dots}{
-	Further parameters for the internal function \code{.reference.regression}. 
-}
+	Further parameters for the internal function \code{.reference.regression}.}
 }
 
 \details{
+	Details about CUB and divergence calculations can be found in \code{\link{CUB}} and \code{\link{div}}. If CUB and/or divergence need to be calculated by an external program, it is possible to provide them in the following format: 
 	\itemize{
 		\item{Codon usage bias}{
 			Example of data file:
@@ -98,7 +115,7 @@ Scientists who designed the method: Gabriel Wallau, Aurélie Hua-Van, Arnaud Le~
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
-\code{\link{plot.vhica}}, \code{\link{image.vhica}}
+\code{\link{plot.vhica}}, \code{\link{image.vhica}}, \code{\link{CUB}}, \code{\link{div}}
 }
 \examples{
 file.cb <- system.file("extdata", "mini-cbias.txt", package="vhica")

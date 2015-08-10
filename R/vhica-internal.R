@@ -377,6 +377,55 @@ function (file, divergence = "dS")
     rawdata[, 1] <- as.character(rawdata[, 1])
     return(rawdata)
 }
+.seq.codon.bias.format <-
+function(CUB, name, tag, species.ref, species.sep) 
+{
+	stopifnot(
+		is.vector(CUB, mode="numeric"),
+		length(CUB) > 0,
+		!is.null(names(CUB)),
+		nchar(name) > 0,
+		nchar(tag) > 0,
+		length(species.ref) > 0)
+	spnamesCUB <- sapply(strsplit(names(CUB), split=species.sep, fixed=TRUE), function(s) s[1])
+	if (length(unique(spnamesCUB)) != length(spnamesCUB)) {
+		stop("In sequence file ", name, " species names are duplicated.")
+	}
+	if (!all(spnamesCUB %in% species.ref)) {
+		stop("In sequence file ", name, " species ", paste(spnamesCUB[!(spnamesCUB %in% species.ref)], collapse=","), " are unknown.")
+	}
+	names(CUB) <- spnamesCUB
+	CUB <- CUB[species.ref]
+	names(CUB) <- species.ref
+	data.frame(Type=tag, as.list(CUB), row.names=name)
+}
+.seq.codon.bias <-
+function(gene.fasta, target.fasta, method="ENC", ref.name="Gene", targ.name="TE", species.sep="_", gene.sep=".")
+{
+	listgenes <- lapply(gene.fasta, function(genefile) CUB(genefile, method=method))
+	names(listgene) <- sapply(strsplit(basename(names(listgene)), split=gene.sep, fixed=TRUE), function(s) s[1])
+	listtarget <- lapply(target.fasta, function(genefile) CUB(genefile, method=method))
+	names(listtarget) <- sapply(strsplit(basename(names(listtarget)), split=gene.sep, fixed=TRUE), function(s) s[1])
+	
+	species <- c(lapply(listgenes, names), lapply(listtarget, names))
+	species <- unique(sapply(strsplit(species, split=species.sep, fixed=TRUE), function(x) x[1]))
+	
+	ans.genes <- do.call(rbind, lapply(1:length(listgenes), function(i) .seq.codon.bias.format(listgenes[[i]], names(listgenes)[i], tag=ref.name, species.ref=species, species.sep=species.sep)))
+	ans.targ <- do.call(rbind, lapply(1:length(listtarget), function(i) .seq.codon.bias.format(listtarget[[i]], names(listtarget)[i], tag=targ.name, species.ref=species, species.sep=species.sep)))
+	return(rbind(ans.genes, ans.targ))
+}
+.seq.divergence <-
+function(sequence.fasta, divergence="dS", method="LWL85", pairwise=FALSE, species.sep="_", gene.sep=".")
+{
+	listseq <- lapply(sequence.fasta, function(genefile) {
+		ans <- div(genefile, method=method, pairwise=pairwise)
+		names(ans)[which(names(ans)=="div")] <- divergence
+		ans$sp1 <- sapply(strsplit(as.character(ans$sp1), split=species.sep, fixed=TRUE), function(s) s[1])
+		ans$sp2 <- sapply(strsplit(as.character(ans$sp2), split=species.sep, fixed=TRUE), function(s) s[1])
+		data.frame(seq=strsplit(basename(sequence.fasta), split=gene.sep, fixed=TRUE)[[1]][1], ans)
+	})
+	do.call(rbind, listseq)
+}
 .reference.regression <-
 function (cbias, div, reference = "Gene", divergence = "dS", 
     CB.as.x = TRUE, warn = FALSE) 
@@ -614,11 +663,11 @@ function(seq, sq1=names(seq)[1], sq2=names(seq)[2], pairwise=FALSE)
 	if (!pairwise) {
 		ali <- seqinr::as.alignment(nb=length(seq), nam=names(seq), seq=sapply(seq, function(s) paste(s, collapse="")))
 		ks <- as.matrix(seqinr::kaks(ali)$ks)
-		return(ks[sq1, sq2])
+		return(ks[cbind(sq1, sq2)])
 	} else {
 		return(sapply(1:length(sq1), function(i) {
 				subseq <- seq[c(sq1[i], sq2[i])]
-				subali <- seqinr::as.alignment(seq=sapply(subseq, function(s) paste(s, collapse="")))
+				subali <- seqinr::as.alignment(nb=2, nam=c(sq1[i], sq2[i]), seq=sapply(subseq, function(s) paste(s, collapse="")))
 				return(seqinr::kaks(subali)$ks[1])
 			}))
 	}

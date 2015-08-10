@@ -27,9 +27,9 @@ div(file = NULL, sequence = NULL, sqs = NULL, method = "LWL85", pairwise = FALSE
 \value{
 	A 3-column data frame with the following fields:
 	\itemize{
+		\item{div:} {The divergence score}	
 		\item{sq1:} {The first sequence in the comparison}
 		\item{sq2:} {The second sequence in the comparison}
-		\item{div:} {The divergence score}
 	}
 }
 \references{

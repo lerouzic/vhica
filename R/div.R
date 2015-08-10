@@ -18,6 +18,7 @@ div <- function
 	}
 	combn <- gtools::combinations(n=length(sqs), r=2, v=sqs)		
 	if (method[1]=="LWL85") {
-		return(data.frame(sq1=combn[,1], sq2=combn[,2], div=.LWL85(sequence, combn[,1], combn[,2], pairwise=pairwise)))
-	}	
+		return(data.frame(div=.LWL85(sequence, combn[,1], combn[,2], pairwise=pairwise), sp1=combn[,1], sp2=combn[,2]))
+	} 
+	stop("Method ", method, " unknown.") # This should never happen
 }
