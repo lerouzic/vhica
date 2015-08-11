@@ -708,13 +708,13 @@ function(seq, sq1=names(seq)[1], sq2=names(seq)[2], pairwise=TRUE, max.lim=max.l
 		ali <- seqinr::as.alignment(nb=length(seq), nam=names(seq), seq=sapply(seq, function(s) paste(s, collapse="")))
 		ks <- as.matrix(seqinr::kaks(ali)$ks)
 		candidate <- ks[cbind(sq1, sq2)]
-		return(ifelse (candidate > max.lim, NA, candidate))
+		return(ifelse (is.na(candidate) | candidate > max.lim, NA, candidate))
 	} else {
 		return(sapply(1:length(sq1), function(i) {
 				subseq <- seq[c(sq1[i], sq2[i])]
 				subali <- seqinr::as.alignment(nb=2, nam=c(sq1[i], sq2[i]), seq=sapply(subseq, function(s) paste(s, collapse="")))
 				candidate <- seqinr::kaks(subali)$ks[1]
-				return(if (candidate > max.lim) NA else candidate)
+				return(if(is.na(candidate) || candidate > max.lim) NA else candidate)
 			}))
 	}
 }
