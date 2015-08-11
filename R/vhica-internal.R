@@ -10,23 +10,24 @@ function (s, strict = FALSE)
     sapply(strsplit(s, split = " "), cap, USE.NAMES = !is.null(names(s)))
 }
 .check.input.consistency <-
-function (cbias, div, warn = FALSE) 
+function (cbias, div, warn = FALSE, family.sep) 
 {
     err.FUN <- stop
     if (warn) 
         err.FUN <- warning
-    seq.cbias <- cbias[, 1]
-    seq.div <- unique(c(.get.TE.sub(div[, 1], species = 1), .get.TE.sub(div[, 
-        1], species = 2)))
+    seq.cbias <- if (which(colnames(cbias) == "Type") == 1 || !is.null(rownames(cbias))) 
+		rownames(cbias) else cbias[, 1]
+		
+    seq.div <- unique(c(.get.TE.sub(as.character(div[, 1]), species = 1, family.sep=family.sep), 
+						.get.TE.sub(as.character(div[, 1]), species = 2, family.sep=family.sep)))
     extra <- seq.cbias[!(seq.cbias %in% seq.div)]
     if (length(extra) > 0) 
         err.FUN("Sequences ", paste(extra, collapse = " "), " are in CB but not in Divergence.")
     extra <- seq.div[!(seq.div %in% seq.cbias)]
     if (length(extra) > 0) 
         err.FUN("Sequences ", paste(extra, collapse = " "), " are in Divergence but not in CB.")
-    sp.cbias <- colnames(cbias)[-c(1, 2)]
-    sp.div <- unique(c(as.character(div[, 3]), as.character(div[, 
-        4])))
+    sp.cbias <- colnames(cbias)[-(1:which(colnames(cbias)=="Type"))]
+    sp.div <- unique(c(as.character(div[, 3]), as.character(div[, 4])))
     extra <- sp.cbias[!(sp.cbias %in% sp.div)]
     if (length(extra) > 0) 
         err.FUN("Species ", paste(extra, collapse = " "), " are in CB but not in Divergence.")
@@ -73,17 +74,17 @@ function (vhica.obj, element, species = NULL, skip.void = FALSE)
         if (nrow(target.table) > 0) {
             for (index.target in 1:nrow(target.table)) {
                 fullname <- rownames(target.table)[index.target]
-                if (.get.TE.fam(fullname) == element) {
-                  if (.get.TE.sub(fullname, sub.only = TRUE) == 
+                if (.get.TE.fam(fullname, family.sep=vhica.obj$family.sep) == element) {
+                  if (.get.TE.sub(fullname, sub.only = TRUE, family.sep=vhica.obj$family.sep) == 
                     "") {
                     element.present <- c(element.present, sp12)
                   }
                   else {
                     if (!is.na(target.table[index.target, "resid"])) {
                       element.present <- c(element.present, paste(sp12, 
-                        c(.get.TE.sub(fullname, species = 1, 
-                          sub.only = TRUE), .get.TE.sub(fullname, 
-                          species = 2, sub.only = TRUE)), sep = "."))
+                        c(.get.TE.sub(fullname, species = 1, sub.only = TRUE, family.sep=vhica.obj$family.sep), 
+						  .get.TE.sub(fullname, species = 2, sub.only = TRUE, family.sep=vhica.obj$family.sep)), 
+						 sep = vhica.obj$family.sep))
                     }
                   }
                 }
@@ -93,17 +94,17 @@ function (vhica.obj, element, species = NULL, skip.void = FALSE)
     element.present <- unique(element.present)
     if (!skip.void && !is.null(species)) {
         already.there <- unique(sapply(element.present, function(el) {
-            strsplit(el, ".", fixed = TRUE)[[1]][1]
+            strsplit(el, vhica.obj$family.sep, fixed = TRUE)[[1]][1]
         }))
         element.present <- c(element.present, species[!(species %in% 
             already.there)])
     }
     if (!is.null(species)) {
         species.only <- sapply(element.present, function(el) {
-            strsplit(el, ".", fixed = TRUE)[[1]][1]
+            strsplit(el, vhica.obj$family.sep, fixed = TRUE)[[1]][1]
         })
         subspecies.only <- sapply(element.present, function(el) {
-            strsplit(el, ".", fixed = TRUE)[[1]][2]
+            strsplit(el, vhica.obj$family.sep, fixed = TRUE)[[1]][2]
         })
         element.present <- element.present[order(match(species.only, 
             species), subspecies.only)]
@@ -111,19 +112,18 @@ function (vhica.obj, element, species = NULL, skip.void = FALSE)
     return(element.present)
 }
 .get.TE.fam <-
-function (seqname) 
+function (seqname, family.sep) 
 {
-    sp <- strsplit(seqname, split = "[./]")[[1]]
-    return(sp[1])
+    sapply(strsplit(seqname, split = family.sep, fixed=TRUE), function(s) s[1])
 }
 .get.TE.sub <-
-function (seqname, species = 1, sub.only = FALSE) 
+function (seqname, species = 1, sub.only = FALSE, family.sep) 
 {
     if (!species %in% c(1, 2)) {
         stop("Species should be 1 or 2")
     }
     .get.TE.sub.intra.subonly <- function(seq) {
-        sp <- strsplit(seq, split = "[./]")[[1]]
+        sp <- strsplit(seq, split = family.sep, fixed=TRUE)[[1]]
         if (length(sp) == 1) 
             return("")
         if (length(sp) == 2) 
@@ -133,19 +133,31 @@ function (seqname, species = 1, sub.only = FALSE)
         stop(paste0("Error: sequence name ", seq, " not properly formatted"))
     }
     .get.TE.sub.intra <- function(seq) {
-        sp <- strsplit(seq, split = "[./]")[[1]]
+        sp <- strsplit(seq, split = family.sep, fixed=TRUE)[[1]]
         if (length(sp) == 1) 
             return(sp)
         if (length(sp) == 2) 
-            return(paste(sp[1], sp[2], sep = "."))
+            return(paste(sp[1], sp[2], sep = family.sep))
         if (length(sp) == 3) 
-            return(paste(sp[1], sp[1 + species], sep = "."))
+            return(paste(sp[1], sp[1 + species], sep = family.sep))
         stop(paste0("Error: sequence name ", seq, " not properly formatted"))
     }
     FUN.sub <- if (sub.only) 
         .get.TE.sub.intra.subonly
     else .get.TE.sub.intra
     return(sapply(seqname, FUN.sub))
+}
+.get.TE.fam.longseq <-
+function(seqname, species.sep, family.sep)
+{
+	sapply(seqname, function(s) {
+		fs <- strsplit(s, split=family.sep, fixed=TRUE)[[1]]
+		fulln <- strsplit(fs[1], split=species.sep, fixed=TRUE)[[1]][1]
+		if (length(fs) == 1) 
+			return(fulln)
+		else
+			return(paste(fulln, fs[length(fs)], sep=family.sep))
+	})
 }
 .make.col.obj <-
 function (n = 1000, max.col = "blue", min.col = "red", mid.col = "white", 
@@ -197,8 +209,6 @@ function (n = 1000, max.col = "blue", min.col = "red", mid.col = "white",
         0)))
     return(ans)
 }
-.PackageName <-
-"vhica"
 .plot.caption <-
 function (col.obj, main = "", p.adjust.method = "none", nslices = 1000, 
     thresh.lines = NA) 
@@ -377,8 +387,38 @@ function (file, divergence = "dS")
     rawdata[, 1] <- as.character(rawdata[, 1])
     return(rawdata)
 }
+.seq.codon.bias.clean <-
+function(ll, gene.sep, species.sep, family.sep)
+{
+	ans <- list()
+	names(ll) <- sapply(strsplit(basename(names(ll)), split=gene.sep, fixed=TRUE), function(s) s[1])
+	for (i in 1:length(ll)) {
+		namsp <- .get.TE.fam.longseq(names(ll[[i]]), species.sep=species.sep, family.sep=family.sep)
+		subf <- .get.TE.sub(namsp, family.sep=family.sep, sub.only=TRUE)
+		sp <- .get.TE.fam(namsp, family.sep=family.sep)
+		if (all(subf == "")) {
+			xx <- ll[[i]]
+			names(xx) <- sp
+			genename <- names(ll)[i]
+			if (genename %in% names(ans)) 
+				stop("Gene ", genename, " duplicated in the data set.")
+			ans[[genename]] <- xx
+		} else {
+			for (ss in unique(subf)) {
+				if (ss=="") stop("Inconsistent sub-family naming in gene ", names(ll)[i], ".")
+				xx <- ll[[i]][subf==ss]
+				names(xx) <- sp[subf==ss]
+				genename <- paste(names(ll)[i], ss, sep=family.sep)
+				if (genename %in% names(ans)) 
+					stop("Gene ", genename, " duplicated in the data set.")				
+				ans[[genename]] <- xx
+			}
+		}
+	}
+	return(ans)
+}
 .seq.codon.bias.format <-
-function(CUB, name, tag, species.ref, species.sep) 
+function(CUB, name, tag, species.ref) 
 {
 	stopifnot(
 		is.vector(CUB, mode="numeric"),
@@ -387,51 +427,56 @@ function(CUB, name, tag, species.ref, species.sep)
 		nchar(name) > 0,
 		nchar(tag) > 0,
 		length(species.ref) > 0)
-	spnamesCUB <- sapply(strsplit(names(CUB), split=species.sep, fixed=TRUE), function(s) s[1])
-	if (length(unique(spnamesCUB)) != length(spnamesCUB)) {
-		stop("In sequence file ", name, " species names are duplicated.")
+	if (any(nchar(names(CUB)) < 1))
+		stop("In sequence file ", name, ": species names too short.")
+	if (length(unique(names(CUB))) != length(names(CUB))) {
+		stop("In sequence file ", name, ": Duplicated species names: ", names(CUB)[duplicated(names(CUB))], ".")
 	}
-	if (!all(spnamesCUB %in% species.ref)) {
-		stop("In sequence file ", name, " species ", paste(spnamesCUB[!(spnamesCUB %in% species.ref)], collapse=","), " are unknown.")
+	if (!all(names(CUB) %in% species.ref)) {
+		stop("In sequence file ", name, ": Unknown species: ", paste(names(CUB)[!(names(CUB) %in% species.ref)], collapse=","), ".")
 	}
-	names(CUB) <- spnamesCUB
 	CUB <- CUB[species.ref]
 	names(CUB) <- species.ref
 	data.frame(Type=tag, as.list(CUB), row.names=name)
 }
 .seq.codon.bias <-
-function(gene.fasta, target.fasta, method="ENC", ref.name="Gene", targ.name="TE", species.sep="_", gene.sep=".")
+function(gene.fasta, target.fasta, method="ENC", ref.name="Gene", targ.name="TE", species.sep="_", gene.sep=".", family.sep=".")
 {
-	listgenes <- lapply(gene.fasta, function(genefile) CUB(genefile, method=method))
-	names(listgene) <- sapply(strsplit(basename(names(listgene)), split=gene.sep, fixed=TRUE), function(s) s[1])
-	listtarget <- lapply(target.fasta, function(genefile) CUB(genefile, method=method))
-	names(listtarget) <- sapply(strsplit(basename(names(listtarget)), split=gene.sep, fixed=TRUE), function(s) s[1])
+	listgenes <- .seq.codon.bias.clean(sapply(gene.fasta, function(genefile) CUB(genefile, method=method),simplify=FALSE, USE.NAMES=TRUE), gene.sep=gene.sep, species.sep=species.sep, family.sep=family.sep)
+	listtarget <- .seq.codon.bias.clean(sapply(target.fasta, function(genefile) CUB(genefile, method=method), simplify=FALSE, USE.NAMES=TRUE), gene.sep=gene.sep, species.sep=species.sep, family.sep=family.sep)
 	
-	species <- c(lapply(listgenes, names), lapply(listtarget, names))
-	species <- unique(sapply(strsplit(species, split=species.sep, fixed=TRUE), function(x) x[1]))
+	species <- unique(unlist(lapply(c(listgenes, listtarget), names)))
 	
-	ans.genes <- do.call(rbind, lapply(1:length(listgenes), function(i) .seq.codon.bias.format(listgenes[[i]], names(listgenes)[i], tag=ref.name, species.ref=species, species.sep=species.sep)))
-	ans.targ <- do.call(rbind, lapply(1:length(listtarget), function(i) .seq.codon.bias.format(listtarget[[i]], names(listtarget)[i], tag=targ.name, species.ref=species, species.sep=species.sep)))
+	ans.genes <- do.call(rbind, lapply(1:length(listgenes), function(i) .seq.codon.bias.format(listgenes[[i]], names(listgenes)[i], tag=ref.name, species.ref=species)))
+	ans.targ <- do.call(rbind, lapply(1:length(listtarget), function(i) .seq.codon.bias.format(listtarget[[i]], names(listtarget)[i], tag=targ.name, species.ref=species)))
 	return(rbind(ans.genes, ans.targ))
 }
 .seq.divergence <-
-function(sequence.fasta, divergence="dS", method="LWL85", pairwise=FALSE, species.sep="_", gene.sep=".")
+function(sequence.fasta, divergence="dS", method="LWL85", pairwise=FALSE, species.sep="_", gene.sep=".", family.sep=".", max.lim=3)
 {
 	listseq <- lapply(sequence.fasta, function(genefile) {
-		ans <- div(genefile, method=method, pairwise=pairwise)
+		ans <- div(genefile, method=method, pairwise=pairwise, max.lim=max.lim)
 		names(ans)[which(names(ans)=="div")] <- divergence
-		ans$sp1 <- sapply(strsplit(as.character(ans$sp1), split=species.sep, fixed=TRUE), function(s) s[1])
-		ans$sp2 <- sapply(strsplit(as.character(ans$sp2), split=species.sep, fixed=TRUE), function(s) s[1])
-		data.frame(seq=strsplit(basename(sequence.fasta), split=gene.sep, fixed=TRUE)[[1]][1], ans)
+		seqn <- rep(strsplit(basename(genefile), split=gene.sep, fixed=TRUE)[[1]][1], nrow(ans))
+		
+		fullsp1 <- .get.TE.fam.longseq(as.character(ans$sp1), species.sep=species.sep, family.sep=family.sep)
+		fullsp2 <- .get.TE.fam.longseq(as.character(ans$sp2), species.sep=species.sep, family.sep=family.sep)
+		ans$sp1 <- .get.TE.fam(fullsp1, family.sep=family.sep)
+		ans$sp2 <- .get.TE.fam(fullsp2, family.sep=family.sep)
+		subf1 <- .get.TE.sub(fullsp1, sub.only=TRUE, family.sep=family.sep)
+		subf2 <- .get.TE.sub(fullsp2, sub.only=TRUE, family.sep=family.sep)
+		if (any(xor(subf1 == "", subf2 == ""))) stop("Inconsistent species/sub-family naming")
+		seqn <- ifelse(subf1=="", seqn, ifelse(subf1==subf2, paste(seqn, subf1, sep=family.sep), paste(seqn, subf1, subf2, sep=family.sep)))
+		data.frame(seq=seqn, ans)
 	})
 	do.call(rbind, listseq)
 }
 .reference.regression <-
 function (cbias, div, reference = "Gene", divergence = "dS", 
-    CB.as.x = TRUE, warn = FALSE) 
+    CB.as.x = TRUE, warn = FALSE, family.sep=".") 
 {
     full.list <- .tables2list(cbias, div, warn = warn, reference = reference, 
-        divergence = divergence)
+        divergence = divergence, family.sep=family.sep)
     if (requireNamespace("parallel", quietly=TRUE)) {
 		mymclapply <- parallel::mclapply
 	} else {
@@ -464,13 +509,13 @@ function (cbias, div, reference = "Gene", divergence = "dS",
     }))
 }
 .reverse.sub <-
-function (seqname) 
+function (seqname, family.sep) 
 {
-    sp <- strsplit(seqname, split = "[./]")
+    sp <- strsplit(seqname, split = family.sep, fixed=TRUE)
     return(unlist(lapply(sp, function(ss) {
-        if (length(ss) == 3) return(paste0(ss[1], ".", ss[3], 
-            "/", ss[2]))
-        if (length(ss) == 2) return(paste0(ss[1], ".", ss[2]))
+        if (length(ss) == 3) return(paste0(ss[1], family.sep, ss[3], 
+            family.sep, ss[2]))
+        if (length(ss) == 2) return(paste0(ss[1], family.sep, ss[2]))
         if (length(ss) == 1) return(ss[1])
         stop("Error: sequence name not properly formatted")
     })))
@@ -485,7 +530,7 @@ function (vhica.obj, element, elements, p.adjust.method = "none",
         for (index.TE2 in (index.TE1 + 1):length(elements)) {
             TE1 <- elements[index.TE1]
             TE2 <- elements[index.TE2]
-            decomp <- strsplit(c(TE1, TE2), split = ".", fixed = TRUE)
+            decomp <- strsplit(c(TE1, TE2), split = vhica.obj$family.sep, fixed = TRUE)
             sp.TE1 <- decomp[[1]][1]
             sp.TE2 <- decomp[[2]][1]
             if (!paste(sp.TE1, "X", sp.TE2, sep = "") %in% names(vhica.obj$reg)) {
@@ -494,8 +539,7 @@ function (vhica.obj, element, elements, p.adjust.method = "none",
                 new.index.TE2 <- index.TE1
                 TE1 <- elements[new.index.TE1]
                 TE2 <- elements[new.index.TE2]
-                decomp <- strsplit(c(TE1, TE2), split = ".", 
-                  fixed = TRUE)
+                decomp <- strsplit(c(TE1, TE2), split = vhica.obj$family.sep, fixed = TRUE)
                 sp.TE1 <- decomp[[1]][1]
                 sp.TE2 <- decomp[[2]][1]
             }
@@ -521,15 +565,15 @@ function (vhica.obj, element, elements, p.adjust.method = "none",
             }
             else {
                 if (sub.TE1 == sub.TE2) {
-                  linename <- paste(element, sub.TE1, sep = ".")
+                  linename <- paste(element, sub.TE1, sep = vhica.obj$family.sep)
                 }
                 else {
                   if (sub.TE2 == "") {
                     linename <- "DOESNOTEXIST"
                   }
                   else {
-                    linename <- paste0(element, ".", sub.TE1, 
-                      "/", sub.TE2)
+                    linename <- paste0(element, vhica.obj$family.sep, sub.TE1, 
+                      vhica.obj$family.sep, sub.TE2)
                   }
                 }
             }
@@ -564,7 +608,7 @@ function (vhica.obj, element, elements, p.adjust.method = "none",
 }
 .tables2list <-
 function (cbias, div, check = TRUE, keep.absent = FALSE, warn = FALSE, 
-    reference = "Gene", divergence = "dS") 
+    reference = "Gene", divergence = "dS", family.sep) 
 {
     if (requireNamespace("parallel", quietly=TRUE)) {
 		mymclapply <- parallel::mclapply
@@ -579,12 +623,12 @@ function (cbias, div, check = TRUE, keep.absent = FALSE, warn = FALSE,
         }
         else {
             rev.species <- (sub.div[nn, "sp1"] == sp2)
-            te1 <- .get.TE.sub(nn, species = 1)
-            te2 <- .get.TE.sub(nn, species = 2)
+            te1 <- .get.TE.sub(nn, species = 1, family.sep=family.sep)
+            te2 <- .get.TE.sub(nn, species = 2, family.sep=family.sep)
             if (rev.species) {
                 cc <- data.frame(Type = cbias[te1, "Type"], CB1 = cbias[te2, 
                   sp1], CB2 = cbias[te1, sp2], div = sub.div[nn, 
-                  divergence], name = .reverse.sub(nn))
+                  divergence], name = .reverse.sub(nn, family.sep=family.sep))
             }
             else {
                 cc <- data.frame(Type = cbias[te1, "Type"], CB1 = cbias[te1, 
@@ -595,7 +639,7 @@ function (cbias, div, check = TRUE, keep.absent = FALSE, warn = FALSE,
         return(cc)
     }
     if (check) 
-        .check.input.consistency(cbias, div, warn = warn)
+        .check.input.consistency(cbias, div, warn = warn, family.sep=family.sep)
     ans <- list()
     species <- unique(c(colnames(cbias)[-c(1, 2)], as.character(div[, 
         3]), as.character(div[, 4])))
@@ -606,7 +650,7 @@ function (cbias, div, check = TRUE, keep.absent = FALSE, warn = FALSE,
             cross <- paste(sp1, sp2, sep = "X")
             sub.div <- div[(div[, 3] == sp1 & div[, 4] == sp2) | 
                 (div[, 3] == sp2 & div[, 4] == sp1), ]
-            compnames <- rownames(sub.div) <- sub.div[, 1]
+            compnames <- rownames(sub.div) <- as.character(sub.div[, 1])
             tt <- do.call(rbind, mymclapply(compnames, .make.unitary.table, 
                 sp1 = sp1, sp2 = sp2, sub.div = sub.div))
             rownames(tt) <- tt$name
@@ -620,7 +664,7 @@ function (cbias, div, check = TRUE, keep.absent = FALSE, warn = FALSE,
     return(ans)
 }
 .checkseq <-
-function(seq) {
+function(seq, gene.name="") {
 	# 0 check if the object makes sense
 	stopifnot(
 		length(seq) > 0,
@@ -629,14 +673,14 @@ function(seq) {
 	# 1 check if all sequences have the same size
 	ll <- sapply(seq, length)
 	if (max(ll) != min(ll)) {
-		warning("Sequences have not the same length. Adding as many n as necessary.")
-		seq <- lapply(seq, function(s) c(s, rep("n", max(ll)-length(s))))
+		warning(gene.name, " Sequences do not have the same length. Adding as many n as necessary.")
+		seq <- lapply(seq, function(s) {ans <- c(s, rep("n", max(ll)-length(s))); class(ans) <- "SeqFastadna"; ans})
 	}
 	#2 check if sequence length is a multiple of 3
 	mll <- max(ll)
 	if (mll %% 3 != 0) {
-		warning("Sequence length ", mll, " is not a multiple of 3. Truncating.")
-		seq <- lapply(seq, function(s) s[1:(3*(mll%/%3))])
+		warning(gene.name, " Sequence length ", mll, " is not a multiple of 3. Truncating.")
+		seq <- lapply(seq, function(s) {ans <- s[1:(3*(mll%/%3))]; class(ans) <- "SeqFastadna"; ans})
 	}
 	return(seq)
 }
@@ -653,7 +697,7 @@ function(seq, numcode=1)
 	2 + sum(SF==2)/mean(Fc[SF==2]) + sum(SF==3)/mean(Fc[SF==3]) + sum(SF==4)/mean(Fc[SF==4]) + sum(SF==6)/mean(Fc[SF==6])    
 }
 .LWL85 <-
-function(seq, sq1=names(seq)[1], sq2=names(seq)[2], pairwise=FALSE)
+function(seq, sq1=names(seq)[1], sq2=names(seq)[2], pairwise=TRUE, max.lim=max.lim)
 {
 	stopifnot(
 		all(sapply(seq, function(s) "SeqFastadna" %in% class(s))),
@@ -663,12 +707,14 @@ function(seq, sq1=names(seq)[1], sq2=names(seq)[2], pairwise=FALSE)
 	if (!pairwise) {
 		ali <- seqinr::as.alignment(nb=length(seq), nam=names(seq), seq=sapply(seq, function(s) paste(s, collapse="")))
 		ks <- as.matrix(seqinr::kaks(ali)$ks)
-		return(ks[cbind(sq1, sq2)])
+		candidate <- ks[cbind(sq1, sq2)]
+		return(ifelse (candidate > max.lim, NA, candidate))
 	} else {
 		return(sapply(1:length(sq1), function(i) {
 				subseq <- seq[c(sq1[i], sq2[i])]
 				subali <- seqinr::as.alignment(nb=2, nam=c(sq1[i], sq2[i]), seq=sapply(subseq, function(s) paste(s, collapse="")))
-				return(seqinr::kaks(subali)$ks[1])
+				candidate <- seqinr::kaks(subali)$ks[1]
+				return(if (candidate > max.lim) NA else candidate)
 			}))
 	}
 }

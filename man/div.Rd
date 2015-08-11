@@ -7,7 +7,8 @@
 	The divergence between DNA sequences can be synonymous (neutral) or non-synonymous. Synonymous differences are generally considered as a better proxy for evolutionary divergence, as it is not affected by selection. This function computes the synonymous divergence between sequences. 
 }
 \usage{
-div(file = NULL, sequence = NULL, sqs = NULL, method = "LWL85", pairwise = FALSE)
+div(file = NULL, sequence = NULL, sqs = NULL, method = "LWL85", 
+	pairwise = TRUE, max.lim = 3)
 }
 \arguments{
   \item{file}{FASTA file in which aligned sequences are stored.
@@ -20,6 +21,7 @@ div(file = NULL, sequence = NULL, sqs = NULL, method = "LWL85", pairwise = FALSE
 }
   \item{pairwise}{Boolean: should the divergence be calculated for each pair of sequences or on the whole dataset? This is of particular importance when indels (gaps) are present in sequences, as codons with gaps are generally discarded by most methods. Setting this option to \code{TRUE} is thus more likely to give accurate results with multiple-gap sequences, but the calculation will also be slower.
 }
+  \item{max.lim}{Maximum value for divergence. Depending on the algorithm, various corrections can bring the divergence value above 100\%. Values larger than \code{max.lim} will be replaced by \code{NA}s, as they can be problematic for further statistical tests.}
 }
 \details{
 	The \code{LWL85} method is a wrapper around the \code{kaks} function from the \code{seqinr} package. 

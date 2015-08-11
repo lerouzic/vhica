@@ -300,8 +300,8 @@ Vps25	0.545	dfic	dere
 Vps25	0.505	dfic	drho
 Vps25	0.324	dere	drho
 droso:11.a	0.034	dana	drho
-droso:11.b/a	0	dana	drho
-droso:11.b/a	0.226	dfic	drho
+droso:11.b.a	0	dana	drho
+droso:11.b.a	0.226	dfic	drho
 irritans:16	0.068	dana	drho
 irritans:10	0.206	dana	dfic
 irritans:10	0.228	dana	drho
@@ -321,12 +321,12 @@ I:1.a	0.11	dana	drho
 I:1.a	0.607	dere	dfic
 I:1.a	0.61	dfic	drho
 I:1.a	0.306	dere	drho
-droso:11.a/b	0.162	dana	dfic
-I:1.a/b	0.605	dere	dfic
-I:1.b/a	0.614	dfic	drho
+droso:11.a.b	0.162	dana	dfic
+I:1.a.b	0.605	dere	dfic
+I:1.b.a	0.614	dfic	drho
 mauritiana:24	0.144	dana	dfic
 droso:11.b	0.167	dana	dfic
-I:1.a/b	0.621	dana	dfic
+I:1.a.b	0.621	dana	dfic
 droso:4	0.153	dana	dere
 droso:4	0.159	dana	drho
 droso:4	0.108	dere	drho

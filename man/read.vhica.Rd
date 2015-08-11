@@ -14,8 +14,8 @@
 read.vhica(gene.fasta=NULL, target.fasta=NULL, 
 	cb.filename=NULL, div.filename=NULL, 
 	reference = "Gene", divergence = "dS", 
-	CUB.method="ENC", div.method="LWL85", div.pairwise=FALSE, 
-	species.sep="_", gene.sep=".", ...)
+	CUB.method="ENC", div.method="LWL85", div.pairwise=TRUE, 
+	div.max.lim=3, species.sep="_", gene.sep=".", family.sep=".", ...)
 }
 
 \arguments{
@@ -40,11 +40,15 @@ read.vhica(gene.fasta=NULL, target.fasta=NULL,
   \item{div.pairwise}{
 	Whether divergence should be calculated from the whole alignment of between pairs of sequences
 	(see \code{\link{div}}).}
+  \item{div.max.lim}{Maximum divergence score. Estimated divergence much larger than 100\% are likely 
+	to be problematic and should not be considered.}
   \item{species.sep}{
 	Separator for species (or equivalent) labels in sequence names. Any character string following 
 	this separator will be disregarded -- be careful about potential duplicates.}
   \item{gene.sep}{
     Separator for gene names from gene sequence files.}
+  \item{family.sep}{
+	Separator for target sequence sub-families.}
   \item{\dots}{
 	Further parameters for the internal function \code{.reference.regression}.}
 }
@@ -98,16 +102,17 @@ CG2214  0.10    Dmel    Dsim
 		\item{reference:} {The \code{reference} option}
 		\item{target:} {The sequence type that is not the reference}
 		\item{divergence:} {The \code{divergence} option}
+		\item{family.sep:} {The character used to indicate TE sub-families}
 	}
 }
 
 \references{
-Gabriel Luz Wallau, Arnaud Le Rouzic, Pierre Capy, Elgion Loreto, Aurélie Hua-Van. VHICA: A new method to discriminate between vertical and horizontal transposon transfer: application to the mariner family within Drosophila. in prep. 
+Gabriel Luz Wallau, Arnaud Le Rouzic, Pierre Capy, Elgion Loreto, Aurelie Hua-Van. VHICA: A new method to discriminate between vertical and horizontal transposon transfer: application to the mariner family within Drosophila. in prep. 
 }
 
 \author{
-Implementation: Arnaud Le Rouzic <lerouzic@legs.cnrs-gif.fr> \cr
-Scientists who designed the method: Gabriel Wallau, Aurélie Hua-Van, Arnaud Le~Rouzic.
+Implementation: Arnaud Le Rouzic \cr
+Scientists who designed the method: Gabriel Wallau, Aurelie Hua-Van, Arnaud Le Rouzic.
 }
 
 %% \note{}

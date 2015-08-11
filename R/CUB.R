@@ -11,7 +11,8 @@ function(file=NULL, sequence=NULL, method="ENC")
 		}		
 		sequence <- seqinr::read.fasta(file)
 	}
-	sequence <- .checkseq(sequence)
+	sequence <- .checkseq(sequence, gene.name=if(is.null(file)) "" else file)
+	
 	if (method[1]=="ENC") {
 		return(sapply(sequence, .ENC))
 	}
