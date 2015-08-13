@@ -694,7 +694,9 @@ function(seq, numcode=1)
     yy.filt <- yy[sapply(yy,sum) > 1 & names(yy) != "*"]
     Fc <- sapply(yy.filt, function(x) {n <- sum(x); (n*sum((x/n)^2)-1)/(n-1)}) 
     SF <- sapply(yy.filt, length)
-	2 + sum(SF==2)/mean(Fc[SF==2]) + sum(SF==3)/mean(Fc[SF==3]) + sum(SF==4)/mean(Fc[SF==4]) + sum(SF==6)/mean(Fc[SF==6])    
+	ans <- 2 + sum(SF==2)/mean(Fc[SF==2]) + sum(SF==3)/mean(Fc[SF==3]) + sum(SF==4)/mean(Fc[SF==4]) + sum(SF==6)/mean(Fc[SF==6])    
+	ans[!is.finite(ans)] <- NA
+	return(ans)
 }
 .LWL85 <-
 function(seq, sq1=names(seq)[1], sq2=names(seq)[2], pairwise=TRUE, max.lim=max.lim)
