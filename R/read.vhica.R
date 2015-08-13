@@ -12,9 +12,9 @@ function (gene.fasta=NULL, target.fasta=NULL, cb.filename=NULL, div.filename=NUL
 		vhica.obj$div <- 
 			.seq.divergence(sequence.fasta=c(gene.fasta, target.fasta), method=div.method, pairwise=div.pairwise, max.lim=div.max.lim, species.sep=species.sep, family.sep=family.sep)
 		if (!is.null(cb.filename))
-			write.table(vhica.obj$cbias, file=cb.filename, sep="\t", quote=FALSE)
+			write.table(vhica.obj$cbias, file=cb.filename, sep="\t", quote=FALSE, row.names=TRUE)
 		if (!is.null(div.filename)) 
-			write.table(vhica.obj$div, file=div.filename, sep="\t", quote=FALSE)
+			write.table(vhica.obj$div, file=div.filename, sep="\t", quote=FALSE, row.names=FALSE)
     } else {
 		vhica.obj$cbias <- .read.codon.bias(file = cb.filename, reference = reference)
 		vhica.obj$div <- .read.divergence(file = div.filename, divergence = divergence)    

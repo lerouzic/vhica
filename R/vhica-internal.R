@@ -9,6 +9,11 @@ function (s, strict = FALSE)
     }, sep = "", collapse = " ")
     sapply(strsplit(s, split = " "), cap, USE.NAMES = !is.null(names(s)))
 }
+.remove.space <-
+function (s)
+{
+	sapply(strsplit(s, split=" ", fixed=TRUE), paste0, collapse="")
+}
 .check.input.consistency <-
 function (cbias, div, warn = FALSE, family.sep) 
 {
@@ -391,7 +396,8 @@ function (file, divergence = "dS")
 function(ll, gene.sep, species.sep, family.sep)
 {
 	ans <- list()
-	names(ll) <- sapply(strsplit(basename(names(ll)), split=gene.sep, fixed=TRUE), function(s) s[1])
+	names(ll) <- sapply(strsplit(basename(names(ll)), split=gene.sep, fixed=TRUE), 
+		function(s) .remove.space(s[1]))
 	for (i in 1:length(ll)) {
 		namsp <- .get.TE.fam.longseq(names(ll[[i]]), species.sep=species.sep, family.sep=family.sep)
 		subf <- .get.TE.sub(namsp, family.sep=family.sep, sub.only=TRUE)
@@ -457,7 +463,7 @@ function(sequence.fasta, divergence="dS", method="LWL85", pairwise=FALSE, specie
 	listseq <- lapply(sequence.fasta, function(genefile) {
 		ans <- div(genefile, method=method, pairwise=pairwise, max.lim=max.lim)
 		names(ans)[which(names(ans)=="div")] <- divergence
-		seqn <- rep(strsplit(basename(genefile), split=gene.sep, fixed=TRUE)[[1]][1], nrow(ans))
+		seqn <- rep(.remove.space(strsplit(basename(genefile), split=gene.sep, fixed=TRUE)[[1]][1]), nrow(ans))
 		
 		fullsp1 <- .get.TE.fam.longseq(as.character(ans$sp1), species.sep=species.sep, family.sep=family.sep)
 		fullsp2 <- .get.TE.fam.longseq(as.character(ans$sp2), species.sep=species.sep, family.sep=family.sep)
