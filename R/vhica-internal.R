@@ -301,8 +301,8 @@ function (tree, species = "", horizontal = FALSE, show.tip.label = FALSE,
 }
 .plot.regression <-
 function (reg, xlim = range(c(reg$model[, 2], reg[[length(reg)]][, 
-    1])), ylim = range(c(reg$model[, 1]), reg[[length(reg)]][, 
-    2]), xlab = names(reg$model)[2], ylab = names(reg$model)[1], 
+    1]), na.rm=TRUE), ylim = range(c(reg$model[, 1]), reg[[length(reg)]][, 
+    2], na.rm=TRUE), xlab = names(reg$model)[2], ylab = names(reg$model)[1], 
     reg.line = TRUE, elements = rownames(reg[[length(reg)]]), 
     pch.gene = 1, pch.element = 2, col.gene = "black", col.element = "black", 
     element.names = TRUE, lty.reg = 2, col.reg = "black", pval = NA, 
