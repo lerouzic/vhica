@@ -450,19 +450,33 @@ function(CUB, name, tag, species.ref)
 .seq.codon.bias <-
 function(gene.fasta, target.fasta, method="ENC", ref.name="Gene", targ.name="TE", species.sep="_", gene.sep=".", family.sep=".")
 {
-	listgenes <- .seq.codon.bias.clean(sapply(gene.fasta, function(genefile) CUB(genefile, method=method),simplify=FALSE, USE.NAMES=TRUE), gene.sep=gene.sep, species.sep=species.sep, family.sep=family.sep)
-	listtarget <- .seq.codon.bias.clean(sapply(target.fasta, function(genefile) CUB(genefile, method=method), simplify=FALSE, USE.NAMES=TRUE), gene.sep=gene.sep, species.sep=species.sep, family.sep=family.sep)
+    if (requireNamespace("parallel", quietly=TRUE)) {
+		mymclapply <- parallel::mclapply
+	} else {
+        mymclapply <- lapply
+    }	
+    CUBgenes <- mymclapply(gene.fasta, function(genefile) CUB(genefile, method=method))
+    names(CUBgenes) <- gene.fasta
+    CUBtarget <- mymclapply(target.fasta, function(genefile) CUB(genefile, method=method))
+    names(CUBtarget) <- target.fasta
+	listgenes <- .seq.codon.bias.clean(CUBgenes, gene.sep=gene.sep, species.sep=species.sep, family.sep=family.sep)
+	listtarget <- .seq.codon.bias.clean(CUBtarget, gene.sep=gene.sep, species.sep=species.sep, family.sep=family.sep)
 	
 	species <- unique(unlist(lapply(c(listgenes, listtarget), names)))
 	
-	ans.genes <- do.call(rbind, lapply(1:length(listgenes), function(i) .seq.codon.bias.format(listgenes[[i]], names(listgenes)[i], tag=ref.name, species.ref=species)))
-	ans.targ <- do.call(rbind, lapply(1:length(listtarget), function(i) .seq.codon.bias.format(listtarget[[i]], names(listtarget)[i], tag=targ.name, species.ref=species)))
+	ans.genes <- do.call(rbind, mymclapply(1:length(listgenes), function(i) .seq.codon.bias.format(listgenes[[i]], names(listgenes)[i], tag=ref.name, species.ref=species)))
+	ans.targ <- do.call(rbind, mymclapply(1:length(listtarget), function(i) .seq.codon.bias.format(listtarget[[i]], names(listtarget)[i], tag=targ.name, species.ref=species)))
 	return(rbind(ans.genes, ans.targ))
 }
 .seq.divergence <-
 function(sequence.fasta, divergence="dS", method="LWL85", pairwise=FALSE, species.sep="_", gene.sep=".", family.sep=".", max.lim=3)
 {
-	listseq <- lapply(sequence.fasta, function(genefile) {
+    if (requireNamespace("parallel", quietly=TRUE)) {
+		mymclapply <- parallel::mclapply
+	} else {
+        mymclapply <- lapply
+    }	
+	listseq <- mymclapply(sequence.fasta, function(genefile) {
 		ans <- div(genefile, method=method, pairwise=pairwise, max.lim=max.lim)
 		names(ans)[which(names(ans)=="div")] <- divergence
 		seqn <- rep(.remove.space(strsplit(basename(genefile), split=gene.sep, fixed=TRUE)[[1]][1]), nrow(ans))
