@@ -15,6 +15,9 @@ function (x, element = "", H1.test = "bilat", treefile = NULL,
     }
     elements <- .element.present(x, element, species = tree$tip.label, 
         skip.void = skip.void)
+    if(is.null(elements)) {
+		stop("Element ", element, " cannot be found. Nothing to plot.")
+    }
     if (length(tree) > 1 && skip.void) {
         missing.species <- tree$tip.label[!tree$tip.label %in% 
             sapply(strsplit(elements, ".", fixed = TRUE), function(el) el[1])]

@@ -255,6 +255,8 @@ function (pmatrix, species, elements, zlim = range(pmatrix, na.rm = TRUE),
     col.obj = .make.col.obj(n = 1000), na.col = "gray", grid.col = "darkgray", 
     ...) 
 {
+	if(sum(!is.na(pmatrix)) == 0)
+		warning("Nothing to plot. Check the dataset and/or the element name.")
     par(mar = c(0.1, 0.1, 0.1, 0.1))
     realx <- 0.5
     for (sp in species) {
