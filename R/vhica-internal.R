@@ -509,8 +509,10 @@ function (cbias, div, reference = "Gene", divergence = "dS",
         cross.TE <- cross[cross$Type != reference, ]
         meanCB <- 0.5 * cross2$CB1 + 0.5 * cross2$CB2
         div <- cross2$div
+        names(div) <- names(meanCB) <- rownames(cross2)
         meanCB.TE <- 0.5 * cross.TE$CB1 + 0.5 * cross.TE$CB2
         div.TE <- cross.TE$div
+        names(meanCB.TE) <- names(div.TE) <- rownames(cross.TE)
         ans <- NULL
         resid.TE <- NULL
         if (CB.as.x) {
@@ -707,7 +709,7 @@ function(seq, gene.name="") {
 	return(seq)
 }
 .ENC <-
-function(seq, numcode=1) 
+function(seq, numcode=1, Wright.corr=TRUE) 
 {
 	stopifnot(
 		"SeqFastadna" %in% class(seq),
@@ -716,8 +718,17 @@ function(seq, numcode=1)
     yy.filt <- yy[sapply(yy,sum) > 1 & names(yy) != "*"]
     Fc <- sapply(yy.filt, function(x) {n <- sum(x); (n*sum((x/n)^2)-1)/(n-1)}) 
     SF <- sapply(yy.filt, length)
-	ans <- 2 + sum(SF==2)/mean(Fc[SF==2]) + sum(SF==3)/mean(Fc[SF==3]) + sum(SF==4)/mean(Fc[SF==4]) + sum(SF==6)/mean(Fc[SF==6])    
+    SF <- SF[Fc != 0]
+    Fc <- Fc[Fc != 0]
+	ans <- 2 + sum(SF==2)/mean(Fc[SF==2]) + sum(SF==3)/mean(Fc[SF==3]) + sum(SF==4)/mean(Fc[SF==4]) + sum(SF==6)/mean(Fc[SF==6])
 	ans[!is.finite(ans)] <- NA
+	if (Wright.corr) {
+		if (sum(SF==3)==0) # No Ile 
+			ans <- ans + 1/(0.5*mean(Fc[SF==2])+0.5*mean(Fc[SF==4]))
+		if (sum(SF==2) == 0 | sum(SF==4) == 0 | sum(SF==6) == 0) 
+			ans <- NA
+		if (is.finite(ans) && ans > 61) ans <- 61
+	}	
 	return(ans)
 }
 .LWL85 <-
