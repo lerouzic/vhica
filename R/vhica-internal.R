@@ -337,11 +337,13 @@ function (reg, xlim = range(c(reg$model[, 2], reg[[length(reg)]][,
     points(reg[[length(reg)]][elements, 1], reg[[length(reg)]][elements, 
         2], pch = pch.element, col = col.element)
     in.elements <- elements %in% rownames(reg[[length(reg)]])
+
     if (element.names && sum(in.elements > 0)) {
         pos <- ifelse(reg[[length(reg)]][elements, 1] > mean(xlim), 
             2, 4)
-        text(reg[[length(reg)]][elements, 1], reg[[length(reg)]][elements, 
-            2], pos = pos[in.elements], labels = elements)
+    NAs <- is.na(pos)
+        text(reg[[length(reg)]][elements, 1][!NAs], reg[[length(reg)]][elements, 
+            2][!NAs], pos = pos[in.elements][!NAs], labels = elements[!NAs])
     }
 }
 .prepare.phylo <-
@@ -429,7 +431,7 @@ function(ll, gene.sep, species.sep, family.sep)
 function(CUB, name, tag, species.ref) 
 {
 	stopifnot(
-		is.vector(CUB, mode="numeric"),
+		all(is.na(CUB)) || is.vector(CUB, mode="numeric"),
 		length(CUB) > 0,
 		!is.null(names(CUB)),
 		nchar(name) > 0,
