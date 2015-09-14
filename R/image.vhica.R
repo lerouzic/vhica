@@ -1,7 +1,7 @@
 image.vhica <-
 function (x, element = "", H1.test = "bilat", treefile = NULL, 
     skip.void = FALSE, species = NULL, p.threshold = 0.05, p.adjust.method = "bonferroni", 
-    ncolors = 1024, main = element, threshcol = 0.1, ...) 
+    ncolors = 1024, main = element, threshcol = 0.1, colsqueeze=1, ...) 
 {
     op <- par(no.readonly = TRUE)
     tree <- .prepare.phylo(treefile)
@@ -27,7 +27,7 @@ function (x, element = "", H1.test = "bilat", treefile = NULL,
     stats <- .stat.matrix(vhica.obj = x, element = element, elements = elements, 
         p.adjust.method = p.adjust.method, H1.test = H1.test)
     thresh <- NULL
-    col.range <- c(0, 0)
+    col.range <- c(-0.5, 0.5)
     if (H1.test != "greater") {
         thresh <- c(thresh, -abs(log10(p.threshold)))
         col.range[1] <- -5
@@ -37,7 +37,7 @@ function (x, element = "", H1.test = "bilat", treefile = NULL,
         col.range[2] <- 5
     }
     cols <- .make.col.obj(n = ncolors, min.col = "red", max.col = "blue", 
-        threshold = thresh, range = col.range, threshcol = threshcol)
+        threshold = thresh, range = col.range, threshcol = threshcol, colsqueeze=colsqueeze)
     layout(matrix(1:4, nrow = 2), widths = c(0.3, 0.7), heights = c(0.3, 
         0.7))
     .plot.caption(col.obj = cols, main = element, p.adjust.method = p.adjust.method, 

@@ -12,7 +12,7 @@ This function plots a composite figure summarizing the evolutionary properties o
 \method{image}{vhica}(x, element = "", H1.test = "bilat", treefile = NULL, 
 skip.void = FALSE, species = NULL, p.threshold = 0.05, 
 p.adjust.method = "bonferroni",  ncolors = 1024, 
-main = element, threshcol=0.1, ...)
+main = element, threshcol=0.1, colsqueeze=1, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -48,6 +48,9 @@ main = element, threshcol=0.1, ...)
 }
   \item{threshcol}{
 	Part of the color spectrum devoted to non-significant values.
+}
+ \item{colsqueeze}{
+	Values larger than 1 shrink the color gradient around the threshold.
 }
   \item{\dots}{
 	Further arguments to the generic function \code{\link{image}}. 

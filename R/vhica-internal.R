@@ -167,7 +167,7 @@ function(seqname, species.sep, family.sep)
 .make.col.obj <-
 function (n = 1000, max.col = "blue", min.col = "red", mid.col = "white", 
     range = c(-5, 5), threshold = c(-1, 1) * abs(log10(0.05)), 
-    threshcol = 0.1, extr = c(-1000, 1000)) 
+    threshcol = 0.1, colsqueeze=1, extr = c(-1000, 1000)) 
 {
     .make.half <- function(nn, thr, ran, ext) {
         thr <- abs(thr)
@@ -180,7 +180,11 @@ function (n = 1000, max.col = "blue", min.col = "red", mid.col = "white",
             ans <- c(ans, seq(0, thr, length.out = nn.t)[-1])
         if (ran > thr) 
             ans <- c(ans, seq(thr, ran, length.out = nn.r)[-1])
-        ans <- c(ans, ext)
+        s <- 1/colsqueeze
+        fun <- function(x)  ifelse(x < thr, x*x*(s-1)/thr + x*(2-s), (x*x*(s-1) - x*(s*(thr+ran) - 2*thr) + ran*thr*(s-1))/(thr-ran))
+        ans <- fun(ans)
+        ans <- ans[ans >= 0 & ans <= ran]       
+        ans <- c(ans, ext)			
         return(ans)
     }
     ans <- list()
