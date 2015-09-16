@@ -615,23 +615,21 @@ function (vhica.obj, element, elements, p.adjust.method = "none",
                 }
                 else if (H1.test == "bilat") {
                   p.val <- 2 * pnorm(-abs(norm.resid))
+                  if (norm.resid > 0) 
+				      p.val <- -p.val
                 }
                 else if (H1.test == "greater") {
-                  p.val <- pnorm(-norm.resid)
+                  p.val <- -pnorm(-norm.resid)
                 }
                 else {
                   stop("H1.test ", H1.test, " incorrect. Should be \"lower\", \"bilat\", or \"greater\".")
-                }
-                if (norm.resid > 0) {
-                  p.val <- -p.val
                 }
                 ans[TE1, TE2] <- ans[TE2, TE1] <- p.val
             }
         }
     }
     corrected.p <- log10(p.adjust(abs(ans[upper.tri(ans)]), method = p.adjust.method))
-    corrected.p <- ifelse(ans[upper.tri(ans)] > 0, corrected.p, 
-        -corrected.p)
+    corrected.p <- ifelse(ans[upper.tri(ans)] > 0, corrected.p, -corrected.p)
     ans[upper.tri(ans)] <- corrected.p
     ans[lower.tri(ans)] <- t(ans)[lower.tri(ans)]
     return(ans)
