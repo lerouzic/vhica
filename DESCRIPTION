@@ -2,9 +2,9 @@ Package: vhica
 Type: Package
 Title: Vertical and Horizontal Inheritance Consistence Analysis
 Version: 0.2.4
-Date: 2015-09-16
+Date: 2015-11-23
 Author: Arnaud Le Rouzic
 Suggests: ape, plotrix, parallel, seqinr, gtools
 Maintainer: Arnaud Le Rouzic <lerouzic@egce.cnrs-gif.fr>
-Description: The VHICA ("Vertical and Horizontal Inheritance Consistence Analysis") method described in Wallau et al. (in prep). The purpose of the method is to detect horizontal transfers of transposable elements, by contrasting the divergence of transposable element sequences with that of regular genes. Two files should be provided, for both a set of reference genes and transposable element sequences: (i) pairwise divergence across species (e.g., dS), (ii) codon usage bias for all genes and elements in all species.
+Description: The "Vertical and Horizontal Inheritance Consistence Analysis" method is described in the following publication: "VHICA: a new method to discriminate between vertical and horizontal transposon transfer: application to the mariner family within Drosophila" by G. Wallau. and collaborators, Mol. Biol. Evol. (in press). The purpose of the method is to detect horizontal transfers of transposable elements, by contrasting the divergence of transposable element sequences with that of regular genes. 
 License: GPL-2
