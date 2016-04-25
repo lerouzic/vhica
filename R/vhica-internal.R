@@ -57,10 +57,11 @@ function (vhica.obj, user.species = NULL, tree.species = NULL)
         warning("Some of the species are not in the data. Dropped.")
         species <- species[!species %in% data.species]
     }
-    if (!is.null(tree.species) && !all(species %in% tree.species)) {
-        warning("Labels in the phylogenetic tree do not match the data set. Better not to plot the tree.")
-    }
     if (!is.null(tree.species)) {
+		if(!all(species %in% tree.species)) {
+			warning("Labels in the phylogenetic tree do not match the data set. Better not to plot the tree.")
+		}
+		species <- unique(c(species, tree.species))
         species <- species[match(tree.species, species)]
     }
     if (is.null(names(species))) {
