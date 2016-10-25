@@ -58,7 +58,16 @@ function (x, element = "", H1.test = "bilat", treefile = NULL,
         col.obj = cols, ...)
     layout(1)
     par(op)
-    ans <- list(tree = tree, species = species, elements = elements, 
-        stats = stats)
+    
+    # There is probably a more elegant way to do this
+    dS <- matrix(NA, ncol=ncol(stats), nrow=nrow(stats))
+    colnames(dS) <- colnames(stats)
+    rownames(dS) <- rownames(stats)
+    dS[as.matrix(x$div[x$div$seq==element, c("sp1","sp2")])] <- x$div$dS[x$div$seq==element]
+    dS[as.matrix(x$div[x$div$seq==element, c("sp2","sp1")])] <- x$div$dS[x$div$seq==element]
+     
+    ans <- list(name = element, tree = tree, species = species, elements = elements, 
+        stats = stats, thresh=thresh, dS=dS)
+    class(ans) <- c("vhicaimage", class(ans))
     return(invisible(ans))
 }

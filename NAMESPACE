@@ -1,6 +1,7 @@
 export(read.vhica, CUB, div)
 S3method(plot, vhica)
 S3method(image, vhica)
+S3method(summary, vhicaimage)
 importFrom("grDevices", "colorRampPalette")
 importFrom("graphics", "abline", "axis", "frame", "image", "layout", "par", "plot", "points", "text", "title")
 importFrom("stats", "coef", "lm", "p.adjust", "pnorm", "qnorm", "resid", "sd")
