@@ -60,7 +60,7 @@ main = element, threshcol=0.1, colsqueeze=1, ...)
 	The figure displays in blue TE copies that are more divergent than expected between species, and in red copies that are less divergent than expected. If several lineages of copies are present in a species, the table will be split to display both lineages. Keys for the interpretation of the pattern and the reconstruction of an evolutionary scenario are provided in the original publication. 
 }
 \value{
-	The function returns (invisibly) a list of elements which can be used for further analysis: \code{tree} contains the phylogenetic tree (object of class \code{"phylo"}), \code{species} is the vector of species, \code{stats} is a matrix of log10(P-values) (positive elements are minus log10(P) corresponding to positive residuals).
+	The function returns (invisibly) a list of elements (object of class \code{imagevhica}) which can be used for further analysis: \code{tree} contains the phylogenetic tree (object of class \code{"phylo"}), \code{species} is the vector of species, \code{stats} is a matrix of log10(P-values) (positive elements are minus log10(P) corresponding to positive residuals), code{dS} is a matrix reminding the divergence rates from the data. Calling the method \code{\link{summary.imagevhica}} on this object returns a nicely formatted data frame. 
 }
 \references{
 Gabriel Luz Wallau, Arnaud Le Rouzic, Pierre Capy, Elgion Loreto, Aurélie Hua-Van. VHICA: A new method to discriminate between vertical and horizontal transposon transfer: application to the mariner family within Drosophila. in prep. 
@@ -74,7 +74,7 @@ Scientists who designed the method: Gabriel Wallau, Aurélie Hua-Van, Arnaud Le~
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
-\code{\link{read.vhica}}, \code{\link{plot.vhica}}
+\code{\link{read.vhica}}, \code{\link{plot.vhica}}, \code{\link{summary.imagevhica}}.
 }
 
 \examples{
@@ -83,7 +83,8 @@ file.div <- system.file("extdata", "mini-div.txt", package="vhica")
 file.tree <- if(require("ape")) system.file("extdata", "phylo.nwk", package="vhica") else NULL
 vc <- read.vhica(cb.filename=file.cb, div.filename=file.div)
 plot(vc, "dere", "dana")
-image(vc, "mellifera:6", treefile=file.tree, skip.void=TRUE)
+im <- image(vc, "mellifera:6", treefile=file.tree, skip.void=TRUE)
+summary(im)
 }
 
 
