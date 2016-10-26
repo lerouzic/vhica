@@ -1,4 +1,4 @@
-summary.vhicaimage <- function(object, divrate=NA, p.thresh=1)
+summary.vhicaimage <- function(object, divrate=NA, p.thresh=1, ...)
 {
     st <- object$stats
     ds <- object$dS
