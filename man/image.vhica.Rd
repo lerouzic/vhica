@@ -63,7 +63,7 @@ main = element, threshcol=0.1, colsqueeze=1, ...)
 	The function returns (invisibly) a list of elements (object of class \code{imagevhica}) which can be used for further analysis: \code{tree} contains the phylogenetic tree (object of class \code{"phylo"}), \code{species} is the vector of species, \code{stats} is a matrix of log10(P-values) (positive elements are minus log10(P) corresponding to positive residuals), code{dS} is a matrix reminding the divergence rates from the data. Calling the method \code{\link{summary.imagevhica}} on this object returns a nicely formatted data frame. 
 }
 \references{
-Gabriel Luz Wallau, Arnaud Le Rouzic, Pierre Capy, Elgion Loreto, Aurélie Hua-Van. VHICA: A new method to discriminate between vertical and horizontal transposon transfer: application to the mariner family within Drosophila. in prep. 
+Gabriel Luz Wallau, Arnaud Le Rouzic, Pierre Capy, Elgion Loreto, Aurélie Hua-Van. VHICA: A new method to discriminate between vertical and horizontal transposon transfer: application to the mariner family within Drosophila. Molecular biology and evolution 33 (4), 1094-1109.
 }
 \author{
 Implementation: Arnaud Le Rouzic <lerouzic@legs.cnrs-gif.fr> \cr

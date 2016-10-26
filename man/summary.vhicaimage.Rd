@@ -32,7 +32,7 @@
 \value{	The resulting \code{data.frame} has 4 or 5 columns. The two first columns are \code{sp1} and \code{sp2}, the two species between which the horizontal transfer is tested, in an arbitrary order. The column \code{p.value} contains the p-value calculated as in \code{\link{vhica.image}} (including the possible correction for multiple testing). The \code{dS} column is a copy of the corresponding divergence from the original data. The last, optional column \code{ Time(Mya)} is a molecular clock estimate of the time of divergence between the two sequences, based on the divergence rate (when provided). }
 
 \references{
-Gabriel Luz Wallau, Arnaud Le Rouzic, Pierre Capy, Elgion Loreto, Aurélie Hua-Van. VHICA: A new method to discriminate between vertical and horizontal transposon transfer: application to the mariner family within Drosophila. in prep. 
+Gabriel Luz Wallau, Arnaud Le Rouzic, Pierre Capy, Elgion Loreto, Aurélie Hua-Van. VHICA: A new method to discriminate between vertical and horizontal transposon transfer: application to the mariner family within Drosophila. Molecular biology and evolution 33 (4), 1094-1109.
 }
 
 \author{
