@@ -226,7 +226,7 @@ function (col.obj, main = "", p.adjust.method = "none", nslices = 1000,
     par(mar = c(4, 1, 2, 1))
     if (!requireNamespace("plotrix", quietly=TRUE)) {
         frame()
-        return
+        return()
     }
     compl <- ""
     if (p.adjust.method != "none") {
