@@ -371,7 +371,7 @@ function (treefile)
 .read.codon.bias <-
 function (file, reference = "Gene") 
 {
-    rawdata <- read.table(file, header = TRUE, row.names = NULL)
+    rawdata <- read.table(file, header = TRUE, row.names = NULL, stringsAsFactors = TRUE)
     if (ncol(rawdata) < 3) {
         stop("Not enough columns in file ", file)
     }
@@ -394,7 +394,7 @@ function (file, reference = "Gene")
 .read.divergence <-
 function (file, divergence = "dS") 
 {
-    rawdata <- read.table(file, header = TRUE, row.names = NULL)
+    rawdata <- read.table(file, header = TRUE, row.names = NULL, stringsAsFactors = TRUE)
     if (ncol(rawdata) != 4) {
         stop("Number of columns different than 4 in file ", file)
     }
