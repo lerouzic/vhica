@@ -1,8 +1,8 @@
 Package: vhica
 Type: Package
 Title: Vertical and Horizontal Inheritance Consistence Analysis
-Version: 0.2.6
-Date: 2016-10-24
+Version: 0.2.7
+Date: 2020-03-02
 Author: Arnaud Le Rouzic
 Suggests: ape, plotrix, parallel, seqinr, gtools
 Maintainer: Arnaud Le Rouzic <lerouzic@egce.cnrs-gif.fr>
