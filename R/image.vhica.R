@@ -1,7 +1,8 @@
 image.vhica <-
 function (x, element = "", H1.test = "bilat", treefile = NULL, 
     skip.void = FALSE, species = NULL, p.threshold = 0.05, p.adjust.method = "bonferroni", 
-    ncolors = 1024, main = element, threshcol = 0.1, colsqueeze=1, ...) 
+    ncolors = 1024, main = element, threshcol = 0.1, colsqueeze=1, species.font.family="mono", species.font.cex=1, 
+    max.spname.length=10, ...) 
 {
     op <- par(no.readonly = TRUE)
     tree <- .prepare.phylo(treefile)
@@ -55,7 +56,8 @@ function (x, element = "", H1.test = "bilat", treefile = NULL,
         frame()
     }
     .plot.matrix(pmatrix = stats, species = species, elements = elements, 
-        col.obj = cols, ...)
+        col.obj = cols, species.font.family=species.font.family, species.font.cex=species.font.cex, 
+        max.spname.length=max.spname.length, ...)
     layout(1)
     par(op)
     

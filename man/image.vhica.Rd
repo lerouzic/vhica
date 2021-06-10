@@ -12,7 +12,9 @@ This function plots a composite figure summarizing the evolutionary properties o
 \method{image}{vhica}(x, element = "", H1.test = "bilat", treefile = NULL, 
 skip.void = FALSE, species = NULL, p.threshold = 0.05, 
 p.adjust.method = "bonferroni",  ncolors = 1024, 
-main = element, threshcol=0.1, colsqueeze=1, ...)
+main = element, threshcol=0.1, colsqueeze=1, 
+species.font.family="mono", species.font.cex=1, 
+    max.spname.length=10, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -49,8 +51,17 @@ main = element, threshcol=0.1, colsqueeze=1, ...)
   \item{threshcol}{
 	Part of the color spectrum devoted to non-significant values.
 }
- \item{colsqueeze}{
+  \item{colsqueeze}{
 	Values larger than 1 shrink the color gradient around the threshold.
+}
+  \item{species.font.family}{
+    Font family for the species names.
+}
+  \item{species.font.cex}{
+    Font size of the species names.
+}
+  \item{max.spname.length}{
+    Maximum length of species names. Longer labels are truncated.
 }
   \item{\dots}{
 	Further arguments to the generic function \code{\link{image}}. 

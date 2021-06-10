@@ -258,7 +258,7 @@ function (col.obj, main = "", p.adjust.method = "none", nslices = 1000,
 .plot.matrix <-
 function (pmatrix, species, elements, zlim = range(pmatrix, na.rm = TRUE), 
     col.obj = .make.col.obj(n = 1000), na.col = "gray", grid.col = "darkgray", 
-    max.spname.length=10, ...) 
+    species.font.family="mono", species.font.cex=1, max.spname.length=10, ...) 
 {
 	if(sum(!is.na(pmatrix)) == 0)
 		warning("Nothing to plot. Check the dataset and/or the element name.")
@@ -290,9 +290,9 @@ function (pmatrix, species, elements, zlim = range(pmatrix, na.rm = TRUE),
     lab <- ifelse(nchar(ns) > max.spname.length, paste0(substr(ns, 1, max.spname.length - 4), "..", substr(ns, nchar(ns)-2, nchar(ns))), ns)
     
     axis(2, at = 1:length(species), labels = rev(lab), 
-        las = 2, lwd.ticks = 0, lwd = 0, family = "mono")
+        las = 2, lwd.ticks = 0, lwd = 0, family = species.font.family, cex.axis=species.font.cex)
     axis(3, at = 1:length(species), labels = lab, 
-        las = 2, lwd.ticks = 0, lwd = 0, family = "mono")
+        las = 2, lwd.ticks = 0, lwd = 0, family = species.font.family, cex.axis=species.font.cex)
 }
 .plot.phylo <-
 function (tree, species = "", horizontal = FALSE, show.tip.label = FALSE, 
