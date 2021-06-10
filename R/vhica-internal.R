@@ -258,7 +258,7 @@ function (col.obj, main = "", p.adjust.method = "none", nslices = 1000,
 .plot.matrix <-
 function (pmatrix, species, elements, zlim = range(pmatrix, na.rm = TRUE), 
     col.obj = .make.col.obj(n = 1000), na.col = "gray", grid.col = "darkgray", 
-    ...) 
+    max.spname.length=10, ...) 
 {
 	if(sum(!is.na(pmatrix)) == 0)
 		warning("Nothing to plot. Check the dataset and/or the element name.")
@@ -266,6 +266,7 @@ function (pmatrix, species, elements, zlim = range(pmatrix, na.rm = TRUE),
     realx <- 0.5
     for (sp in species) {
         nn <- length(grep(pattern = sp, x = elements))
+        if (nn != 1) browser()
         realx <- c(realx, realx[length(realx)] + seq(0, 1, length.out = nn + 
             1)[-1])
     }
@@ -286,9 +287,12 @@ function (pmatrix, species, elements, zlim = range(pmatrix, na.rm = TRUE),
         abline(v = seq(from = 0.5, by = 1, length.out = length(species) + 
             1), col = grid.col)
     }
-    axis(2, at = 1:length(species), labels = rev(names(species)), 
+    ns <- names(species)
+    lab <- ifelse(nchar(ns) > max.spname.length, paste0(substr(ns, 1, max.spname.length - 4), "..", substr(ns, nchar(ns)-2, nchar(ns))), ns)
+    
+    axis(2, at = 1:length(species), labels = rev(lab), 
         las = 2, lwd.ticks = 0, lwd = 0, family = "mono")
-    axis(3, at = 1:length(species), labels = names(species), 
+    axis(3, at = 1:length(species), labels = lab, 
         las = 2, lwd.ticks = 0, lwd = 0, family = "mono")
 }
 .plot.phylo <-
