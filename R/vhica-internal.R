@@ -452,7 +452,7 @@ function(CUB, name, tag, species.ref)
 	}
 	CUB <- CUB[species.ref]
 	names(CUB) <- species.ref
-	data.frame(Type=tag, as.list(CUB), row.names=name, check.names=FALSE)
+	data.frame(Type=as.factor(tag), as.list(CUB), row.names=name, check.names=FALSE)
 }
 .seq.codon.bias <-
 function(gene.fasta, target.fasta, method="ENC", ref.name="Gene", targ.name="TE", species.sep="_", gene.sep=".", family.sep=".")
