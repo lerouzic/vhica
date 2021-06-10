@@ -16,6 +16,8 @@ div <- function
 	if (is.null(sqs)) {
 		sqs <- names(sequence)
 	}
+	if (length(sqs) < 2)
+		stop("Less than 2 sequences in ", file)
 	combn <- gtools::combinations(n=length(sqs), r=2, v=sqs)
 	if (method[1]=="LWL85") {
 		return(data.frame(div=.LWL85(sequence, combn[,1], combn[,2], pairwise=pairwise, max.lim=max.lim), sp1=combn[,1], sp2=combn[,2]))
