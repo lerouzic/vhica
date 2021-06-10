@@ -31,7 +31,7 @@ function (cbias, div, warn = FALSE, family.sep)
     extra <- seq.div[!(seq.div %in% seq.cbias)]
     if (length(extra) > 0) 
         err.FUN("Sequences ", paste(extra, collapse = " "), " are in Divergence but not in CB.")
-    sp.cbias <- colnames(cbias)[-(1:which(colnames(cbias)=="Type"))]
+    sp.cbias <- colnames(cbias)[-(seq_len(which(colnames(cbias)=="Type")))]
     sp.div <- unique(c(as.character(div[, 3]), as.character(div[, 4])))
     extra <- sp.cbias[!(sp.cbias %in% sp.div)]
     if (length(extra) > 0) 
@@ -78,7 +78,7 @@ function (vhica.obj, element, species = NULL, skip.void = FALSE)
         sp12 <- unlist(strsplit(cross, "X"))
         target.table <- vhica.obj$reg[[cross]][[vhica.obj$target]]
         if (nrow(target.table) > 0) {
-            for (index.target in 1:nrow(target.table)) {
+            for (index.target in seq_len(nrow(target.table))) {
                 fullname <- rownames(target.table)[index.target]
                 if (.get.TE.fam(fullname, family.sep=vhica.obj$family.sep) == element) {
                   if (.get.TE.sub(fullname, sub.only = TRUE, family.sep=vhica.obj$family.sep) == 
@@ -289,9 +289,9 @@ function (pmatrix, species, elements, zlim = range(pmatrix, na.rm = TRUE),
     ns <- names(species)
     lab <- ifelse(nchar(ns) > max.spname.length, paste0(substr(ns, 1, max.spname.length - 4), "..", substr(ns, nchar(ns)-2, nchar(ns))), ns)
     
-    axis(2, at = 1:length(species), labels = rev(lab), 
+    axis(2, at = seq_along(species), labels = rev(lab), 
         las = 2, lwd.ticks = 0, lwd = 0, family = species.font.family, cex.axis=species.font.cex)
-    axis(3, at = 1:length(species), labels = lab, 
+    axis(3, at = seq_along(species), labels = lab, 
         las = 2, lwd.ticks = 0, lwd = 0, family = species.font.family, cex.axis=species.font.cex)
 }
 .plot.phylo <-
@@ -378,7 +378,7 @@ function (file, reference = "Gene")
     if (ncol(rawdata) < 3) {
         stop("Not enough columns in file ", file)
     }
-    type.column <- which(sapply(1:ncol(rawdata), function(x) {
+    type.column <- which(sapply(seq_len(ncol(rawdata)), function(x) {
         is.factor(rawdata[, x])
     }))
     if (length(type.column) != 1) {
@@ -410,7 +410,7 @@ function(ll, gene.sep, species.sep, family.sep)
 	ans <- list()
 	names(ll) <- sapply(strsplit(basename(names(ll)), split=gene.sep, fixed=TRUE), 
 		function(s) .remove.space(s[1]))
-	for (i in 1:length(ll)) {
+	for (i in seq_along(ll)) {
 		namsp <- .get.TE.fam.longseq(names(ll[[i]]), species.sep=species.sep, family.sep=family.sep)
 		subf <- .get.TE.sub(namsp, family.sep=family.sep, sub.only=TRUE)
 		sp <- .get.TE.fam(namsp, family.sep=family.sep)
@@ -474,8 +474,8 @@ function(gene.fasta, target.fasta, method="ENC", ref.name="Gene", targ.name="TE"
 	
 	species <- unique(unlist(lapply(c(listgenes, listtarget), names)))
 	
-	ans.genes <- do.call(rbind, mymclapply(1:length(listgenes), function(i) .seq.codon.bias.format(listgenes[[i]], names(listgenes)[i], tag=ref.name, species.ref=species)))
-	ans.targ <- do.call(rbind, mymclapply(1:length(listtarget), function(i) .seq.codon.bias.format(listtarget[[i]], names(listtarget)[i], tag=targ.name, species.ref=species)))
+	ans.genes <- do.call(rbind, mymclapply(seq_along(listgenes), function(i) .seq.codon.bias.format(listgenes[[i]], names(listgenes)[i], tag=ref.name, species.ref=species)))
+	ans.targ <- do.call(rbind, mymclapply(seq_along(listtarget), function(i) .seq.codon.bias.format(listtarget[[i]], names(listtarget)[i], tag=targ.name, species.ref=species)))
 	return(rbind(ans.genes, ans.targ))
 }
 .seq.divergence <-
@@ -558,6 +558,7 @@ function (seqname, family.sep)
 function (vhica.obj, element, elements, p.adjust.method = "none", 
     H1.test = "bilat") 
 {
+	stopifnot(length(elements) > 1)
     ans <- matrix(NA, ncol = length(elements), nrow = length(elements))
     colnames(ans) <- rownames(ans) <- elements
     for (index.TE1 in 1:(length(elements) - 1)) {
@@ -675,6 +676,7 @@ function (cbias, div, check = TRUE, keep.absent = FALSE, warn = FALSE,
     ans <- list()
     species <- unique(c(colnames(cbias)[-c(1, 2)], as.character(div[, 
         3]), as.character(div[, 4])))
+    stopifnot(length(species) > 1)
     for (index.sp1 in 1:(length(species) - 1)) {
         for (index.sp2 in (index.sp1 + 1):length(species)) {
             sp1 <- species[index.sp1]
@@ -753,7 +755,7 @@ function(seq, sq1=names(seq)[1], sq2=names(seq)[2], pairwise=TRUE, max.lim=max.l
 		candidate <- ks[cbind(sq1, sq2)]
 		return(ifelse (is.na(candidate) | candidate > max.lim, NA, candidate))
 	} else {
-		return(sapply(1:length(sq1), function(i) {
+		return(sapply(seq_along(sq1), function(i) {
 				subseq <- seq[c(sq1[i], sq2[i])]
 				subali <- seqinr::as.alignment(nb=2, nam=c(sq1[i], sq2[i]), seq=sapply(subseq, function(s) paste(s, collapse="")))
 				candidate <- seqinr::kaks(subali)$ks[1]
