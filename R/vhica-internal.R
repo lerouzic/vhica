@@ -264,11 +264,10 @@ function (pmatrix, species, elements, zlim = range(pmatrix, na.rm = TRUE),
 		warning("Nothing to plot. Check the dataset and/or the element name.")
     par(mar = c(0.1, 0.1, 0.1, 0.1))
     realx <- 0.5
+    extra.elements <- elements[!elements %in% species]
     for (sp in species) {
-        nn <- length(grep(pattern = sp, x = elements))
-        if (nn != 1) browser()
-        realx <- c(realx, realx[length(realx)] + seq(0, 1, length.out = nn + 
-            1)[-1])
+        nn <- 1 + length(grep(pattern = sp, x = extra.elements))
+        realx <- c(realx, realx[length(realx)] + seq(0, 1, length.out = nn + 1)[-1])
     }
     ccol <- col.obj$col
     cbreaks <- col.obj$breaks
