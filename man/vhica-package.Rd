@@ -29,10 +29,12 @@ In addition, it provides tools to calculate divergence (\code{\link{div}}) and c
 }
 
 \author{
-Implementation: Arnaud Le Rouzic <lerouzic@egce.cnrs-gif.fr> \cr
+Implementation: Arnaud Le Rouzic <arnaud.le-rouzic@universite-paris-saclay.fr> \cr
 Scientists who designed the method: Gabriel Wallau, Aurélie Hua-Van, Arnaud Le~Rouzic.
 
-Maintainer: Arnaud Le Rouzic <lerouzic@egce.cnrs-gif.fr>
+Maintainer: Arnaud Le Rouzic <arnaud.le-rouzic@universite-paris-saclay.fr>
+	
+Repository: https://github.com/lerouzic/vhica
 }
 \references{
 Gabriel Luz Wallau, Arnaud Le Rouzic, Pierre Capy, Elgion Loreto, Aurélie Hua-Van. VHICA: A new method to discriminate between vertical and horizontal transposon transfer: application to the mariner family within Drosophila. Molecular biology and evolution 33 (4), 1094-1109.
